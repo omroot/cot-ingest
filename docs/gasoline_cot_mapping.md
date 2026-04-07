@@ -38,6 +38,10 @@ Note: Natural gasoline (NGL) contracts appear under `commodity_name` =
 | **111659** | GASOLINE RBOB - NEW YORK MERCANTILE EXCHANGE | GASOLINE | (same contract, name variant) | |
 | **11165J** | RBOB GASOLINE FINANCIAL - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Cash-settled futures | Yes — RBOB financial settlement |
 | **111416** | RBOB GASOLINE 1ST LINE - ICE FUTURES ENERGY DIV | GASOLINE | Cash-settled futures | Yes — ICE Energy Div RBOB flat price |
+| **11165K** | RBOB CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Calendar swap | Yes — added per Marouen's review |
+| **111A11** | SINGAPORE MOGUS 92 SWAP FUTURE - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Cash-settled swap | Yes — Singapore gasoline, added per Marouen's review |
+| **111A11** | SINGAPORE MOGUS 92 - NEW YORK MERCANTILE EXCHANGE | GASOLINE | (same contract, name variant) | |
+| **111A47** | MINI EUROBOB GAS OXY NWE - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Futures | Yes — European gasoline, added per Marouen's review |
 
 ## CFTC — Excluded Contracts
 
@@ -45,8 +49,6 @@ Note: Natural gasoline (NGL) contracts appear under `commodity_name` =
 
 | `cftc_contract_market_code` | `market_and_exchange_names` | `commodity_name` | Reason Excluded |
 |-----------------------------|----------------------------|------------------|-----------------|
-| 11165K | RBOB CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Calendar roll spread |
-| 11165K | RBOB CALENDAR - NEW YORK MERCANTILE EXCHANGE | GASOLINE | (same contract, name variant) |
 | 11165L | RBOB UP-DOWN CAL SWAP - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Up-down calendar spread |
 | 11165L | RBOB UP-DOWN CAL - NEW YORK MERCANTILE EXCHANGE | GASOLINE | (same contract, name variant) |
 
@@ -57,9 +59,6 @@ Note: Natural gasoline (NGL) contracts appear under `commodity_name` =
 | 111A08 | GRP 3 SOC GAS VS RBOB SPR - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Group 3 sub-octane vs RBOB basis |
 | 111A31 | GULF COAST UNL 87 GAS M2 PL RB - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Gulf Coast unleaded vs RBOB basis |
 | 111A34 | GULF COAST CBOB GAS A2 PL RBOB - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Gulf Coast CBOB vs RBOB basis |
-| 111A11 | SINGAPORE MOGUS 92 SWAP FUTURE - NEW YORK MERCANTILE EXCHANGE | GASOLINE | Singapore gasoline — different product and location |
-| 111A11 | SINGAPORE MOGUS 92 - NEW YORK MERCANTILE EXCHANGE | GASOLINE | (same contract, name variant) |
-| 111A47 | MINI EUROBOB GAS OXY NWE - NEW YORK MERCANTILE EXCHANGE | GASOLINE | European gasoline — different product and location |
 
 ### Crack Spreads (gasoline vs crude)
 

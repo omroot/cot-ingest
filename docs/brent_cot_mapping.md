@@ -36,6 +36,7 @@ Extracted from `downloads/cftc/disaggregated_combined.csv`:
 | **06765T** | BRENT CRUDE OIL LAST DAY - NYMEX | Physically-delivered futures | Yes — last trading day settlement |
 | **06765Y** | BRENT AVG PRICE OPTIONS - NYMEX | Asian-style options | Yes — options on Brent flat price |
 | **06765X** | EUR STYLE BRENT OPTIONS - NYMEX | European-style options | Yes — options on Brent flat price |
+| **06765N** | BRENT (ICE) CALENDAR SWAP - NYMEX | Calendar swap | Yes — added per Marouen's review |
 
 ## CFTC (NYMEX) — Excluded Contracts
 
@@ -44,7 +45,6 @@ not contribute to directional flat price exposure:
 
 | Code | Contract | Reason Excluded |
 |------|----------|-----------------|
-| 06765N | BRENT (ICE) CALENDAR SWAP | Time spread (front vs back months) |
 | 06765L | WTI-BRENT CALENDAR SWAP | Inter-commodity spread |
 | 06765Z | WTI-BRENT SPREAD OPTION | Inter-commodity spread option |
 | 06765O | BRENT-DUBAI SWAP | Location spread |

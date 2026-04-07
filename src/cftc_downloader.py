@@ -1,3 +1,11 @@
+"""Download CFTC Commitments of Traders data from the public reporting API.
+
+Supports seven datasets: disaggregated, legacy, and TFF, each in futures-only
+and combined (futures + delta-adjusted options) variants, plus the
+Supplemental/CIT report (futures-only). Data is paginated
+at 50,000 records per request and saved as CSV files.
+"""
+
 import argparse
 import logging
 from pathlib import Path
@@ -11,68 +19,137 @@ logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
-
-DATASETS = {
-    "disaggregated": {"id": "72hh-3qpy", "filename": "disaggregated_futures_only.csv"},
-    "disaggregated_combined": {"id": "kh3c-gbw2", "filename": "disaggregated_combined.csv"},
-    "legacy": {"id": "6dca-aqww", "filename": "legacy_futures_only.csv"},
-    "legacy_combined": {"id": "jun7-fc8e", "filename": "legacy_combined.csv"},
-    "tff": {"id": "gpe5-46if", "filename": "tff_futures_only.csv"},
-    "tff_combined": {"id": "yw9f-hn96", "filename": "tff_combined.csv"},
+DATASETS: dict[str, dict[str, str]] = {
+    "disaggregated": {
+        "id": "72hh-3qpy",
+        "filename": "disaggregated_futures_only.csv",
+    },
+    "disaggregated_combined": {
+        "id": "kh3c-gbw2",
+        "filename": "disaggregated_combined.csv",
+    },
+    "legacy": {
+        "id": "6dca-aqww",
+        "filename": "legacy_futures_only.csv",
+    },
+    "legacy_combined": {
+        "id": "jun7-fc8e",
+        "filename": "legacy_combined.csv",
+    },
+    "tff": {
+        "id": "gpe5-46if",
+        "filename": "tff_futures_only.csv",
+    },
+    "tff_combined": {
+        "id": "yw9f-hn96",
+        "filename": "tff_combined.csv",
+    },
+    "cit": {
+        "id": "4zgm-a668",
+        "filename": "cit_futures_only.csv",
+    },
 }
 
 
 class CFTCDownloader:
+    """Client for the CFTC Public Reporting API (Socrata-based).
+
+    Downloads COT data with automatic pagination, optional API token
+    authentication (with fallback to unauthenticated requests), and
+    CSV persistence with merge/deduplicate support.
+    """
+
     BASE_URL = "https://publicreporting.cftc.gov/resource/{dataset_id}.json"
     PAGE_SIZE = 50_000
 
-    def __init__(self, app_token: str, output_dir: Path, dataset: str = "disaggregated"):
-        self.app_token = app_token
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+    def __init__(
+        self,
+        application_token: str,
+        output_directory: Path,
+        dataset: str = "disaggregated",
+    ) -> None:
+        """Initialize the CFTC downloader.
+
+        Args:
+            application_token: CFTC API application token for authentication.
+                If rejected (403), the downloader falls back to unauthenticated.
+            output_directory: Directory where CSV files will be saved.
+            dataset: Name of the CFTC dataset to download. Must be a key in DATASETS.
+        """
+        self.application_token = application_token
+        self.output_directory = Path(output_directory)
+        self.output_directory.mkdir(parents=True, exist_ok=True)
         self.dataset_info = DATASETS[dataset]
         self.dataset_name = dataset
         self.url = self.BASE_URL.format(dataset_id=self.dataset_info["id"])
 
-    def _fetch_page(self, offset: int, where_clause: str | None = None) -> list[dict]:
-        headers = {}
-        if self.app_token:
-            headers["X-App-Token"] = self.app_token
-        params = {
+    def _fetch_page(
+        self, offset: int, where_clause: str | None = None
+    ) -> list[dict]:
+        """Fetch a single page of records from the CFTC API.
+
+        Args:
+            offset: Number of records to skip (for pagination).
+            where_clause: Optional SoQL WHERE filter expression.
+
+        Returns:
+            List of record dictionaries from the API response.
+        """
+        headers: dict[str, str] = {}
+        if self.application_token:
+            headers["X-App-Token"] = self.application_token
+        parameters = {
             "$limit": self.PAGE_SIZE,
             "$offset": offset,
             "$order": "report_date_as_yyyy_mm_dd ASC",
         }
         if where_clause:
-            params["$where"] = where_clause
+            parameters["$where"] = where_clause
 
-        response = requests.get(self.url, headers=headers, params=params, timeout=120)
+        response = requests.get(
+            self.url, headers=headers, params=parameters, timeout=120
+        )
 
-        # If token causes 403, retry without it (unauthenticated but throttled)
-        if response.status_code == 403 and self.app_token:
+        if response.status_code == 403 and self.application_token:
             logger.warning("App token rejected (403). Retrying without token.")
-            self.app_token = None
+            self.application_token = None
             headers.pop("X-App-Token", None)
-            response = requests.get(self.url, headers=headers, params=params, timeout=120)
+            response = requests.get(
+                self.url, headers=headers, params=parameters, timeout=120
+            )
 
         response.raise_for_status()
         return response.json()
 
-    def _fetch_all(self, where_clause: str | None = None) -> pd.DataFrame:
-        all_records = []
+    def _fetch_all_records(
+        self, where_clause: str | None = None
+    ) -> pd.DataFrame:
+        """Fetch all records by paginating through the API.
+
+        Args:
+            where_clause: Optional SoQL WHERE filter expression.
+
+        Returns:
+            DataFrame containing all fetched records, or an empty DataFrame
+            if no records were returned.
+        """
+        all_records: list[dict] = []
         offset = 0
 
         while True:
             logger.info(f"Fetching page at offset {offset}...")
-            page = self._fetch_page(offset, where_clause)
+            page_records = self._fetch_page(offset, where_clause)
 
-            if not page:
+            if not page_records:
                 break
 
-            all_records.extend(page)
-            logger.info(f"Retrieved {len(page)} records (total: {len(all_records)})")
+            all_records.extend(page_records)
+            logger.info(
+                f"Retrieved {len(page_records)} records "
+                f"(total: {len(all_records)})"
+            )
 
-            if len(page) < self.PAGE_SIZE:
+            if len(page_records) < self.PAGE_SIZE:
                 break
 
             offset += self.PAGE_SIZE
@@ -83,84 +160,143 @@ class CFTCDownloader:
         return pd.DataFrame(all_records)
 
     def download_full_history(self) -> pd.DataFrame:
-        """Download all COT data (2006+)."""
-        logger.info(f"Downloading full CFTC {self.dataset_name} history...")
-        df = self._fetch_all()
-        logger.info(f"Downloaded {len(df)} total records")
-        return df
+        """Download the complete history for this dataset (2006+).
 
-    def download_latest(self, since_date: str) -> pd.DataFrame:
-        """Download COT data since a given date (YYYY-MM-DD)."""
+        Returns:
+            DataFrame with all available records.
+        """
+        logger.info(
+            f"Downloading full CFTC {self.dataset_name} history..."
+        )
+        records = self._fetch_all_records()
+        logger.info(f"Downloaded {len(records)} total records")
+        return records
+
+    def download_since(self, since_date: str) -> pd.DataFrame:
+        """Download records reported after a given date.
+
+        Args:
+            since_date: Cutoff date in YYYY-MM-DD format. Only records with
+                report_date_as_yyyy_mm_dd strictly after this date are returned.
+
+        Returns:
+            DataFrame with records since the given date.
+        """
         where_clause = f"report_date_as_yyyy_mm_dd > '{since_date}'"
-        logger.info(f"Downloading CFTC {self.dataset_name} data since {since_date}...")
-        df = self._fetch_all(where_clause)
-        logger.info(f"Downloaded {len(df)} records since {since_date}")
-        return df
+        logger.info(
+            f"Downloading CFTC {self.dataset_name} data since {since_date}..."
+        )
+        records = self._fetch_all_records(where_clause)
+        logger.info(f"Downloaded {len(records)} records since {since_date}")
+        return records
 
-    def save(self, df: pd.DataFrame, filename: str | None = None, merge: bool = False):
-        """Save DataFrame to CSV in the output directory.
+    def save(
+        self,
+        dataframe: pd.DataFrame,
+        filename: str | None = None,
+        merge: bool = False,
+    ) -> Path:
+        """Save a DataFrame to CSV in the output directory.
 
-        If merge=True and the file already exists, append new rows and deduplicate.
+        Args:
+            dataframe: Data to save.
+            filename: Target filename. Defaults to the dataset's configured filename.
+            merge: If True and the file already exists, append new rows and
+                deduplicate by dropping exact duplicate rows.
+
+        Returns:
+            Path to the saved CSV file.
         """
         if filename is None:
             filename = self.dataset_info["filename"]
-        filepath = self.output_dir / filename
+        filepath = self.output_directory / filename
         if merge and filepath.exists():
-            existing = pd.read_csv(filepath)
-            df = pd.concat([existing, df], ignore_index=True)
-            df = df.drop_duplicates()
-            df = df.sort_values("report_date_as_yyyy_mm_dd").reset_index(drop=True)
-        df.to_csv(filepath, index=False)
-        logger.info(f"Saved {len(df)} records to {filepath}")
+            existing_data = pd.read_csv(filepath)
+            dataframe = pd.concat(
+                [existing_data, dataframe], ignore_index=True
+            )
+            dataframe = dataframe.drop_duplicates()
+            dataframe = dataframe.sort_values(
+                "report_date_as_yyyy_mm_dd"
+            ).reset_index(drop=True)
+        dataframe.to_csv(filepath, index=False)
+        logger.info(f"Saved {len(dataframe)} records to {filepath}")
         return filepath
 
 
-def update_all_datasets(output_dir: Path, app_token: str) -> dict:
-    """Auto-detect the latest date in each dataset and download the delta.
+def update_all_datasets(
+    output_directory: Path, application_token: str
+) -> dict[str, dict[str, object]]:
+    """Auto-detect the latest date in each dataset and download new records.
 
-    Returns a dict of {dataset_name: {"new_rows": int, "latest_date": str}}.
+    For each of the six CFTC datasets, reads the existing CSV to find the
+    most recent report date, then downloads only records after that date.
+    If no existing file is found, downloads the full history.
+
+    Args:
+        output_directory: Directory containing (and receiving) CSV files.
+        application_token: CFTC API application token.
+
+    Returns:
+        Dictionary mapping dataset names to their update results, each
+        containing 'new_rows' (int) and 'latest_date' (str).
     """
-    results = {}
-    for name, info in DATASETS.items():
-        filepath = output_dir / info["filename"]
+    results: dict[str, dict[str, object]] = {}
+    for dataset_name, dataset_info in DATASETS.items():
+        filepath = output_directory / dataset_info["filename"]
 
-        # Detect the latest date already on disk
-        since_date = None
+        since_date: str | None = None
         if filepath.exists():
-            existing = pd.read_csv(filepath, usecols=["report_date_as_yyyy_mm_dd"])
-            if not existing.empty:
-                since_date = existing["report_date_as_yyyy_mm_dd"].max()[:10]
+            existing_data = pd.read_csv(
+                filepath, usecols=["report_date_as_yyyy_mm_dd"]
+            )
+            if not existing_data.empty:
+                since_date = existing_data[
+                    "report_date_as_yyyy_mm_dd"
+                ].max()[:10]
 
-        downloader = CFTCDownloader(app_token=app_token, output_dir=output_dir, dataset=name)
+        downloader = CFTCDownloader(
+            application_token=application_token,
+            output_directory=output_directory,
+            dataset=dataset_name,
+        )
 
         if since_date:
-            df = downloader.download_latest(since_date)
-            if not df.empty:
-                downloader.save(df, merge=True)
+            new_data = downloader.download_since(since_date)
+            if not new_data.empty:
+                downloader.save(new_data, merge=True)
         else:
-            df = downloader.download_full_history()
-            if not df.empty:
-                downloader.save(df)
+            new_data = downloader.download_full_history()
+            if not new_data.empty:
+                downloader.save(new_data)
 
-        # Read back the latest date after save
-        latest = "—"
+        latest_date = "—"
         if filepath.exists():
-            saved = pd.read_csv(filepath, usecols=["report_date_as_yyyy_mm_dd"])
-            if not saved.empty:
-                latest = saved["report_date_as_yyyy_mm_dd"].max()[:10]
+            saved_data = pd.read_csv(
+                filepath, usecols=["report_date_as_yyyy_mm_dd"]
+            )
+            if not saved_data.empty:
+                latest_date = saved_data[
+                    "report_date_as_yyyy_mm_dd"
+                ].max()[:10]
 
-        results[name] = {"new_rows": len(df), "latest_date": latest}
+        results[dataset_name] = {
+            "new_rows": len(new_data),
+            "latest_date": latest_date,
+        }
 
     return results
 
 
-def main():
+def main() -> None:
+    """CLI entry point for downloading CFTC COT data."""
     parser = argparse.ArgumentParser(description="Download CFTC COT data")
     parser.add_argument(
         "--since",
         type=str,
         default=None,
-        help="Download data since this date (YYYY-MM-DD). If omitted, downloads full history.",
+        help="Download data since this date (YYYY-MM-DD). "
+        "If omitted, downloads full history.",
     )
     parser.add_argument(
         "--dataset",
@@ -169,29 +305,29 @@ def main():
         default="disaggregated",
         help="Which CFTC report to download (default: disaggregated).",
     )
-    args = parser.parse_args()
+    arguments = parser.parse_args()
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
-    creds_path = ROOT_DIR / ".env"
-    credentials = load_cftc_credentials(creds_path)
-    output_dir = ROOT_DIR / "downloads" / "cftc"
+    credentials_path = ROOT_DIR / ".env"
+    credentials = load_cftc_credentials(credentials_path)
+    output_directory = ROOT_DIR / "downloads" / "cftc"
 
     downloader = CFTCDownloader(
-        app_token=credentials["key_id"],
-        output_dir=output_dir,
-        dataset=args.dataset,
+        application_token=credentials["key_id"],
+        output_directory=output_directory,
+        dataset=arguments.dataset,
     )
 
-    if args.since:
-        df = downloader.download_latest(args.since)
-        downloader.save(df, merge=True)
+    if arguments.since:
+        downloaded_data = downloader.download_since(arguments.since)
+        downloader.save(downloaded_data, merge=True)
     else:
-        df = downloader.download_full_history()
-        downloader.save(df)
+        downloaded_data = downloader.download_full_history()
+        downloader.save(downloaded_data)
 
 
 if __name__ == "__main__":

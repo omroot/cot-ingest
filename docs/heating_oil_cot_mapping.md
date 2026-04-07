@@ -15,7 +15,7 @@ jurisdiction. There is no separate ICE Europe heating oil contract.
 |--------|----------|-----------|--------|
 | **CFTC** | NYMEX (New York) | US CFTC | CFTC disaggregated combined |
 
-Note: ICE Futures Europe publishes Gasoil (QS) which is a related but distinct
+Note: ICE Futures Europe  publishes Gasoil (QS) which is a related but distinct
 product — European low-sulphur gasoil vs US ultra-low-sulphur diesel. They are
 **not** fungible and trade at different price levels.
 
@@ -45,18 +45,13 @@ filter by `cftc_contract_market_code` to isolate flat price contracts.
 | **022653** | HEATING OIL AVG PRICE OPTIONS - NYMEX | Asian-style options | Yes — options on HO flat price |
 | **022654** | EUR STYLE HEATING OIL OPTIONS - NYMEX | European-style options | Yes — options on HO flat price |
 | **022A05** | GULF COAST ULSD SWAP - NYMEX | Cash-settled futures | Yes — outright ULSD flat price for USGC delivery |
+| **02265V** | GASOIL (ICE) SWAP - NYMEX | Cash-settled swap | Yes — added per Marouen's review |
+| **022A24** | GASOIL (ICE) MINI CAL SWAP - NYMEX | Swap | Yes — added per Marouen's review |
+| **022A46** | GASOIL AVG PRICE OPTIONS - NYMEX | Asian-style options | Yes — added per Marouen's review |
+| **02265J** | SING GASOIL SWAP - NYMEX | Swap | Yes — added per Marouen's review |
+| **022A22** | SING GASOIL BALMO SWAP - NYMEX | Swap | Yes — added per Marouen's review |
 
 ## CFTC (NYMEX) — Excluded Contracts
-
-### Gasoil / Regional Swaps (different product or location basis)
-
-| Code | Contract | Reason Excluded |
-|------|----------|-----------------|
-| 02265V | GASOIL (ICE) SWAP | ICE Gasoil reference price — different product (European gasoil) |
-| 022A24 | GASOIL (ICE) MINI CAL SWAP | Same — mini version of ICE Gasoil swap |
-| 022A46 | GASOIL AVG PRICE OPTIONS | Options on gasoil, not HO |
-| 02265J | SING GASOIL SWAP | Singapore gasoil — different product and location |
-| 022A22 | SING GASOIL BALMO SWAP | Singapore gasoil balance-of-month |
 
 ### Crack Spreads (product vs crude)
 

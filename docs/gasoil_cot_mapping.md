@@ -49,14 +49,11 @@ Gasoil-related CFTC contracts appear under multiple `commodity_name` values:
 |-----------------------------|----------------------------|------------------|------|-------------|
 | **02265V** | GASOIL (ICE) SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Cash-settled swap | Yes — NYMEX-listed swap referencing ICE Gasoil flat price |
 | **022A46** | GASOIL AVG PRICE OPTIONS - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Asian-style options | Yes — options on Gasoil flat price |
+| **022A24** | GASOIL (ICE) MINI CAL SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Swap | Yes — added per Marouen's review |
+| **02265J** | SING GASOIL SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Swap | Yes — Singapore gasoil, added per Marouen's review |
+| **022A22** | SING GASOIL BALMO SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Swap | Yes — Singapore gasoil balmo, added per Marouen's review |
 
 ## CFTC (NYMEX) — Excluded Contracts
-
-### Calendar / Mini Swaps
-
-| `cftc_contract_market_code` | `market_and_exchange_names` | `commodity_name` | Reason Excluded |
-|-----------------------------|----------------------------|------------------|-----------------|
-| 022A24 | GASOIL (ICE) MINI CAL SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Calendar spread (mini) |
 
 ### Location Spreads
 
@@ -66,8 +63,6 @@ Gasoil-related CFTC contracts appear under multiple `commodity_name` values:
 | 02265U | NYMEX HEATING OIL/RDAM GASOIL - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | HO vs Rotterdam Gasoil arb |
 | 02265T | SING GASOIL ICE GASOIL SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Singapore vs ICE Gasoil location spread |
 | 02265T | SING GASOIL/RDAM GASOIL SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | (same contract, name variant) |
-| 02265J | SING GASOIL SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Singapore gasoil — different delivery location |
-| 022A22 | SING GASOIL BALMO SWAP - NEW YORK MERCANTILE EXCHANGE | HEATING OIL-DIESEL-GASOIL | Singapore gasoil balance-of-month |
 
 ### Crack Spreads (gasoil vs crude)
 

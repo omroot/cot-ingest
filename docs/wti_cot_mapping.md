@@ -54,18 +54,22 @@ by `commodity_name` alone is **not sufficient**. You must filter by
 | **06765C** | CRUDE OIL AVG PRICE OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Asian-style options | Yes — options on WTI flat price |
 | **06765B** | EUR STYLE CRUDE OIL OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | European-style options | Yes — options on WTI flat price |
 | **06741Q** | WTI CRUDE OIL 1ST LINE - ICE FUTURES ENERGY DIV | CRUDE OIL | Cash-settled futures | Yes — ICE Energy Div WTI flat price |
+| **06765A** | WTI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Calendar swap | Yes — added per Marouen's review |
+| **06765A** | WTI CRUDE OIL CALENDAR - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) | |
+| **06765A** | WTI FINANCIAL CRUDE OIL - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) | |
+| **06765G** | DUBAI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Calendar swap | Yes — added per Marouen's review |
 
 ## CFTC — Excluded Contracts
 
-### Brent Flat Price (separate ticker — see `brent_cot_mapping.md`)
+### Brent Flat Price (belongs to CO — see `brent_cot_mapping.md`)
 
 | `cftc_contract_market_code` | `market_and_exchange_names` | `commodity_name` | Reason Excluded |
 |-----------------------------|----------------------------|------------------|-----------------|
-| 06765J | BRENT FINANCIAL - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent flat price, not WTI |
-| 06765T | BRENT CRUDE OIL LAST DAY - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent flat price, not WTI |
-| 06765T | BRENT LAST DAY - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) |
-| 06765Y | BRENT AVG PRICE OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent options, not WTI |
-| 06765X | EUR STYLE BRENT OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent options, not WTI |
+| 06765J | BRENT FINANCIAL - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent flat price — mapped to CO, not CL |
+| 06765T | BRENT CRUDE OIL LAST DAY - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent flat price — mapped to CO, not CL |
+| 06765N | BRENT (ICE) CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent calendar swap — mapped to CO, not CL |
+| 06765X | EUR STYLE BRENT OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent options — mapped to CO, not CL |
+| 06765Y | BRENT AVG PRICE OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent options — mapped to CO, not CL |
 
 ### Other Crude Grades (different product)
 
@@ -83,9 +87,7 @@ by `commodity_name` alone is **not sufficient**. You must filter by
 | 06765L | WTI-BRENT CALENDAR - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) |
 | 06765Z | WTI-BRENT SPREAD OPTION - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | WTI vs Brent spread option |
 | 06765O | BRENT-DUBAI SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent vs Dubai spread |
-| 06765G | DUBAI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Dubai calendar spread |
 | 06765M | DATED TO FRONTLINE BRENT SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent structure spread |
-| 06765N | BRENT (ICE) CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Brent calendar spread |
 | 06741R | WTI 1st Line-Brent 1st Line - ICE FUTURES ENERGY DIV | CRUDE OIL | WTI vs Brent spread |
 
 ### Location / Quality Diffs
@@ -110,9 +112,6 @@ by `commodity_name` alone is **not sufficient**. You must filter by
 |-----------------------------|----------------------------|------------------|-----------------|
 | 067657 | CRUDE OIL CAL SPREAD OPTIONS - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Time spread options |
 | 067A28 | CRUDE OIL CAL SPREAD OPT FIN - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Financial calendar spread options |
-| 06765A | WTI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Calendar roll spread |
-| 06765A | WTI CRUDE OIL CALENDAR - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) |
-| 06765A | WTI FINANCIAL CRUDE OIL - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) |
 
 ### Crack Spreads (product vs crude — in other `commodity_name` buckets)
 
@@ -160,7 +159,6 @@ The test: if WTI Cushing moves $1/bbl and everything else (Brent, Dubai, Mars,
 Midland, products) moves $1 in the same direction, does the position make or
 lose money? If no, it's a spread — exclude it.
 
-Note: `06765A` (WTI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE) is
-excluded despite being "WTI" because it represents the **time spread** between
-two WTI contract months, not outright flat price exposure. If both months move
-$1, the P&L is zero.
+Note: `06765A` (WTI CRUDE OIL CALENDAR SWAP) and `06765G` (DUBAI CRUDE OIL
+CALENDAR SWAP) were added per Marouen's review. These are calendar swaps
+(settle against average price), not calendar spreads.
