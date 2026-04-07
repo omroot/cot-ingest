@@ -37,6 +37,7 @@ Extracted from `downloads/cftc/disaggregated_combined.csv`:
 | **06765Y** | BRENT AVG PRICE OPTIONS - NYMEX | Asian-style options | Yes — options on Brent flat price |
 | **06765X** | EUR STYLE BRENT OPTIONS - NYMEX | European-style options | Yes — options on Brent flat price |
 | **06765N** | BRENT (ICE) CALENDAR SWAP - NYMEX | Calendar swap | Yes — added per Marouen's review |
+| **06765G** | DUBAI CRUDE OIL CALENDAR SWAP - NYMEX | Calendar swap | Yes — Dubai calendar swap, moved from WTI per Marouen's review |
 
 ## CFTC (NYMEX) — Excluded Contracts
 

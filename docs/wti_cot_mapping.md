@@ -57,7 +57,6 @@ by `commodity_name` alone is **not sufficient**. You must filter by
 | **06765A** | WTI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Calendar swap | Yes — added per Marouen's review |
 | **06765A** | WTI CRUDE OIL CALENDAR - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) | |
 | **06765A** | WTI FINANCIAL CRUDE OIL - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | (same contract, name variant) | |
-| **06765G** | DUBAI CRUDE OIL CALENDAR SWAP - NEW YORK MERCANTILE EXCHANGE | CRUDE OIL | Calendar swap | Yes — added per Marouen's review |
 
 ## CFTC — Excluded Contracts
 
@@ -159,6 +158,6 @@ The test: if WTI Cushing moves $1/bbl and everything else (Brent, Dubai, Mars,
 Midland, products) moves $1 in the same direction, does the position make or
 lose money? If no, it's a spread — exclude it.
 
-Note: `06765A` (WTI CRUDE OIL CALENDAR SWAP) and `06765G` (DUBAI CRUDE OIL
-CALENDAR SWAP) were added per Marouen's review. These are calendar swaps
-(settle against average price), not calendar spreads.
+Note: `06765A` (WTI CRUDE OIL CALENDAR SWAP) was added per Marouen's review.
+This is a calendar swap (settles against average price), not a calendar spread.
+`06765G` (DUBAI CRUDE OIL CALENDAR SWAP) was moved to Brent (CO).
